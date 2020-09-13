@@ -51,7 +51,24 @@ def add_member():
 
 @app.route('/member/<int:member_id>', methods=['PUT'])
 def edit_member(member_id):
-    return None
+    new_member_data = request.get_json()
+    name = new_member_data['name']
+    email = new_member_data['email']
+    level = new_member_data['level']
+
+    cur = mysql.connect.cursor()
+    cur.execute('SELECT name FROM members WHERE id = %s', [member_id])
+    check_result = cur.fetchone()
+    if check_result == None:
+        return Response('User not found', status=404)
+        
+    cur.execute('UPDATE members SET name = %s, email = %s, level = %s WHERE id = %s', [name, email, level, member_id])
+    cur.connection.commit()
+
+    cur.execute('SELECT id, name, email, level FROM members WHERE id = %s', [member_id])
+    result = cur.fetchone()
+
+    return jsonify(result)
 
 @app.route('/member/<int:member_id>', methods=['DELETE'])
 def delete_member(member_id):

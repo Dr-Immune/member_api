@@ -14,7 +14,7 @@ def members():
     cur = mysql.connect.cursor()
     cur.execute('SELECT * FROM members')
     result = cur.fetchall()
-    
+
     return jsonify(result)
 
 @app.route('/member/<int:member_id>', methods=['GET'])
@@ -55,7 +55,14 @@ def edit_member(member_id):
 
 @app.route('/member/<int:member_id>', methods=['DELETE'])
 def delete_member(member_id):
-    return None
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT name FROM members WHERE id = %s', [member_id])
+    check_result = cur.fetchone()
+    if check_result == None:
+        return Response('User not found', status=404)
+    cur.execute('DELETE FROM members WHERE id = %s', [member_id])
+    cur.connection.commit()
+    return Response('Member deleted successfuly', status=200)
 
 if __name__ == "__main__":
     app.run(debug=True)

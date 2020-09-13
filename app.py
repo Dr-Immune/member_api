@@ -11,11 +11,22 @@ mysql = MySQL(app)
 
 @app.route('/member', methods=['GET'])
 def members():
-    return None
+    cur = mysql.connect.cursor()
+    cur.execute('SELECT * FROM members')
+    result = cur.fetchall()
+    
+    return jsonify(result)
 
 @app.route('/member/<int:member_id>', methods=['GET'])
 def member(member_id):
-    return None
+    cur = mysql.connect.cursor()
+    cur.execute('SELECT * FROM members WHERE id = %s', [member_id])
+    result = cur.fetchone()
+
+    if result == None:
+        print('str')
+        return Response('Member not found', status=404)
+    return jsonify(result)
 
 @app.route('/member', methods=['POST'])
 def add_member():

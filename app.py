@@ -21,6 +21,7 @@ def authentication(f):
             cur = mysql.connection.cursor()
             cur.execute('SELECT password FROM users WHERE username = %s', [received_username])
             result = cur.fetchone()
+            cur.close()
 
             if check_password_hash(result['password'], received_password):
                 return f(*args, **kwargs)
@@ -35,6 +36,7 @@ def members():
     cur = mysql.connect.cursor()
     cur.execute('SELECT * FROM members')
     result = cur.fetchall()
+    cur.close()
 
     return jsonify(result)
 
@@ -44,6 +46,7 @@ def member(member_id):
     cur = mysql.connect.cursor()
     cur.execute('SELECT * FROM members WHERE id = %s', [member_id])
     result = cur.fetchone()
+    cur.close()
 
     if result == None:
         print('str')
@@ -65,6 +68,7 @@ def add_member():
 
     cur.execute('SELECT * FROM members WHERE name = %s ', [name])
     result = cur.fetchone()
+    cur.close()
 
     if result == None:
         return Response('error', status=400)
@@ -91,6 +95,7 @@ def edit_member(member_id):
 
     cur.execute('SELECT id, name, email, level FROM members WHERE id = %s', [member_id])
     result = cur.fetchone()
+    cur.close()
 
     return jsonify(result)
 
@@ -104,6 +109,7 @@ def delete_member(member_id):
         return Response('User not found', status=404)
     cur.execute('DELETE FROM members WHERE id = %s', [member_id])
     cur.connection.commit()
+    cur.close()
     return Response('Member deleted successfuly', status=200)
 
 @app.route('/user', methods=['POST'])
@@ -125,6 +131,7 @@ def add_user():
 
     cur.execute('SELECT username FROM users WHERE username = %s', [username])
     result = cur.fetchone()
+    cur.close()
 
     if result == None:
         return Response('User not created', status=500)
@@ -140,6 +147,7 @@ def check_user():
     cur = mysql.connect.cursor()
     cur.execute('SELECT username, password FROM users WHERE username = %s', [username])
     result = cur.fetchone()
+    cur.close()
     
     check_result = check_password_hash(result['password'], password)
 
